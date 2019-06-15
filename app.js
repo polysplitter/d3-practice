@@ -32,7 +32,7 @@ function ready(movies) {
         return d3.descending(a.revenue, b.revenue)
     })
 
-    const margin = { top: 40, right: 40, bottom: 40, left: 40 }
+    const margin = { top: 80, right: 40, bottom: 40, left: 80 }
     const width = 400 - margin.left - margin.right
     const height = 500 - margin.top - margin.bottom
 
@@ -56,6 +56,20 @@ function ready(movies) {
       .append('g')
       .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
+    // draw header - it's better to use html for this.
+    const header = svg
+        .append('g')
+        .attr('class', 'bar-header')
+        .attr('transform', `translate(0, ${-margin.top / 2})`)
+        .append('text')
+
+    header.append('tspan').text('Total revenue by genre in $US')
+    header.append('tspan').text('Films w/ budget and revenue figures, 2000-2009')
+    .attr('x', 0)
+    .attr('dy', '1.5em')
+    .style('font-size', '0.8em')
+    .style('fill', '#555')
+
     // Draw bars.
     svg.selectAll('.bar')
        .data(barChartData)
@@ -66,9 +80,16 @@ function ready(movies) {
        .attr('width', d => xScale(d.revenue))
        .attr('height', yScale.bandwidth())
        .style('fill', 'dodgerblue');
+    
+    function formatTicks(d) {
+        return d3.format('~s')(d)
+            .replace('M', ' mil')
+            .replace('G', ' bil')
+            .replace('T', ' tril')
+    }
 
     // Draw axes.
-    const xAxis = d3.axisTop(xScale).tickFormat(d3.format('~s'))
+    const xAxis = d3.axisTop(xScale).tickFormat(formatTicks)
                     .tickSizeInner(-height)
                     .tickSizeOuter(0)
 
@@ -76,7 +97,13 @@ function ready(movies) {
         .attr('class', 'x axis')
         .call(xAxis)
 
+    const yAxis = d3.axisLeft(yScale).tickSize(0)
 
+    const yAxisDraw = svg.append('g')
+        .attr('class', 'y axis')
+        .call(yAxis)
+
+    yAxisDraw.selectAll('text').attr('dx', '-0.6em')
 }
 
 // type converstion
