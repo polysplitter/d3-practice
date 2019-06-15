@@ -66,6 +66,17 @@ function ready(movies) {
        .attr('width', d => xScale(d.revenue))
        .attr('height', yScale.bandwidth())
        .style('fill', 'dodgerblue');
+
+    // Draw axes.
+    const xAxis = d3.axisTop(xScale).tickFormat(d3.format('~s'))
+                    .tickSizeInner(-height)
+                    .tickSizeOuter(0)
+
+    const xAxisDraw = svg.append('g')
+        .attr('class', 'x axis')
+        .call(xAxis)
+
+
 }
 
 // type converstion
