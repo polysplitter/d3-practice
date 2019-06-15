@@ -11,9 +11,25 @@ function filterData(data) {
     })
 }
 
+function prepareBarChartData(data) {
+    const dataMap = d3.rollup(
+        data,
+        v => d3.sum(v, leaf => leaf.revenue),
+        d => d.genre
+    )
+    
+    const dataArray = Array.from(dataMap, d => ({ genre: d[0], revenue: d[1] }))
+
+    return dataArray
+}
+
 function ready(movies){
     const moviesClean = filterData(movies)
-    console.log(moviesClean)
+    const barChartData = prepareBarChartData(moviesClean).sort((a, b) => {
+        return d3.descending(a.revenue - b.revenue)
+    })
+
+    console.log(barChartData)
 }
 
 const parseNA = string => (string === 'NA' ? undefined : string)
