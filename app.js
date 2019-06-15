@@ -1,4 +1,5 @@
-const parseNA = string => (string === 'NA' ? undefined : string);
+const parseNA = string => (string === 'NA' ? undefined : string)
+const parseDate = string => d3.timeParse('%Y-%m-%d')(string)
 
 // type converstion
 function type(d) {
@@ -14,7 +15,7 @@ function type(d) {
         popularity: +d.popularity,
         poster_path: parseNA(d.poster_path),
         production_countries: d.production_countries,
-        release_date: d.release_date,
+        release_date: parseDate(d.release_date),
         revenue: +d.revenue,
         runtime: +d.runtime,
         tagline: parseNA(d.tagline),
