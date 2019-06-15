@@ -1,3 +1,5 @@
+const parseNA = string => (string === 'NA' ? undefined : string)
+const parseDate = string => d3.timeParse('%Y-%m-%d')(string)
 
 function filterData(data) {
     return data.filter(d => {
@@ -24,17 +26,47 @@ function prepareBarChartData(data) {
     return dataArray
 }
 
-function ready(movies){
+function ready(movies) {
     const moviesClean = filterData(movies)
     const barChartData = prepareBarChartData(moviesClean).sort((a, b) => {
-        return d3.descending(a.revenue - b.revenue)
+        return d3.descending(a.revenue, b.revenue)
     })
 
-    console.log(barChartData)
-}
+    const margin = { top: 40, right: 40, bottom: 40, left: 40 }
+    const width = 400 - margin.left - margin.right
+    const height = 500 - margin.top - margin.bottom
 
-const parseNA = string => (string === 'NA' ? undefined : string)
-const parseDate = string => d3.timeParse('%Y-%m-%d')(string)
+    // Scales.
+    const xMax = d3.max(barChartData, d => d.revenue)
+
+    const xScale = d3.scaleLinear()
+        .domain([0, xMax])
+        .range([0, width])
+
+    const yScale = d3.scaleBand()
+        .domain(barChartData.map(d => d.genre))
+        .rangeRound([0, height])
+        .paddingInner(0.25)
+
+    // Draw base.
+    const svg = d3.select(".bar-chart-container")
+      .append('svg')
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom)
+      .append('g')
+      .attr('transform', `translate(${margin.left}, ${margin.top})`)
+
+    // Draw bars.
+    svg.selectAll('.bar')
+       .data(barChartData)
+       .enter()
+       .append('rect')
+       .attr('class', 'bar')
+       .attr('y', d => yScale(d.genre))
+       .attr('width', d => xScale(d.revenue))
+       .attr('height', yScale.bandwidth())
+       .style('fill', 'dodgerblue');
+}
 
 // type converstion
 function type(d) {
